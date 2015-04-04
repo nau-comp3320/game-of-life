@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="REPL" type="ClojureREPL" factoryName="Local" singleton="true">
+    <setting name="useLein" value="true" />
+    <setting name="useClojureMain" value="false" />
+    <setting name="leinProjectName" value="game-of-life:0.1.0-SNAPSHOT" />
+    <module name="game_of_life" />
+    <setting name="jvmArgs" value="" />
+    <setting name="parameters" value="" />
+    <setting name="workingDir" value="$PROJECT_DIR$" />
+    <method />
+  </configuration>
+</component>
