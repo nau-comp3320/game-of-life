@@ -10,7 +10,7 @@
   (into {}
         (for [x (range width)
               y (range height)]
-          (let [alive? (rand-nth [true false])]
+          (let [alive? (rand-nth [true false false])]
             [[x y] alive?]))))
 
 (defn new-game
@@ -30,31 +30,52 @@
         (print (if alive? \X \space))))
     (println)))
 
-(defn apply-rules-to-position
-  [[pos alive?]]
-  (cond
-    (and alive?
-         (> (num-live-neighbors pos) 2))
-       [pos false]
-    (and alive?
-         (>= 3 (num-live-neighbors pos) 2))
-       [pos true]
-    (and alive?
-         (> (num-live-neighbors pos) 3))
-       [pos false]
-    (and (not alive?)
-         (= (num-live-neighbors pos) 3))
-       [pos true]))
+(defn get-neighbors
+  "Given a position, get all neighboring positions."
+  [[x y]]
+  (for [nx (range (dec x) (+ x 2))
+        ny (range (dec y) (+ y 2))
+        :when (not (and (= x nx) (= y ny) ))]
+    [nx ny]))
+
+(defn num-live-neighbors
+  "Given a board and a position on the board, return the
+   number of live neighbors for that positions within the board."
+  [board pos]
+  (let [neighbors (get-neighbors pos)]
+    (count (filter true? (map board neighbors)))))
+
+(defn create-position-rule-applier
+  [board]
+  (fn [[pos alive?]]
+    (cond
+      (and alive?
+           (> 2 (num-live-neighbors board pos)))
+        [pos false]
+      (and alive?
+           (>= 3 (num-live-neighbors board pos) 2))
+        [pos true]
+      (and alive?
+           (> (num-live-neighbors board pos) 3))
+      [pos false]
+      (and (not alive?)
+         (= (num-live-neighbors board pos) 3))
+        [pos true])))
 
 (defn apply-rules
   [{:keys [board] :as state}]
-  (let [new-board (into {} (map apply-rules-to-position board))]
+  (let [new-board (into {} (map (create-position-rule-applier board)
+                                board))]
     (assoc state :board new-board)))
-
-(let [game (new-game 10 10)]
-  (= game (apply-rules game)))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (loop [game (new-game 30 30)]
+    (println)
+    (println)
+    (println)
+    (println)
+    (display-board game)
+    (Thread/sleep 500)
+    (recur (apply-rules game))))
